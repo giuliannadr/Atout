@@ -1,0 +1,124 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+@theme {
+  /* ─── Atout Brand Palette ──────────────────────────────────── */
+  /* Primary: Deep Royal Violet — sophisticated, premium, distinctive */
+  --color-primary: #2D1B69;
+  --color-primary-dark: #1A0F42;
+  --color-primary-light: #EEE9FF;
+  --color-primary-mid: #C4B5FD;
+
+  /* Accent: Amber Gold — vibrant, premium, reads clearly on dark + light */
+  --color-accent: #F59E0B;
+  --color-accent-light: #FFFBEB;
+  --color-accent-mid: #FCD34D;
+
+  /* Dark: near-black with violet tint */
+  --color-dark: #0F0A1E;
+  
+  --color-success: #166534;
+  --color-success-light: #F0FDF4;
+  --color-success-mid: #BBF7D0;
+
+  --color-warning: #92400E;
+  --color-warning-light: #FFFBEB;
+  --color-warning-mid: #FDE68A;
+
+  --color-danger: #B91C1C;
+  --color-danger-light: #FEF2F2;
+  --color-danger-mid: #FECACA;
+
+  /* Force Hex for default grays to avoid oklch in html2canvas */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-gray-950: #030712;
+
+  --radius-std: 10px;
+
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+/* Explicitly source files for Tailwind v4 */
+@source "../index.html";
+@source "./**/*.{js,ts,jsx,tsx}";
+
+@layer base {
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  body {
+    @apply bg-gray-50 text-dark antialiased font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  /* Hyper-professional UI Components (Styles expanded to avoid @apply issues in v4) */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-std font-semibold transition-all duration-300 active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none text-sm cursor-pointer bg-primary text-white hover:bg-primary-dark shadow-lg shadow-primary/10 hover:shadow-primary/20;
+  }
+  
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-std font-semibold transition-all duration-300 active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none text-sm cursor-pointer bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm;
+  }
+  
+  .btn-accent {
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-std font-semibold transition-all duration-300 active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none text-sm cursor-pointer bg-accent text-white hover:bg-orange-700 shadow-lg shadow-accent/10 hover:shadow-accent/20;
+  }
+  
+  .card {
+    @apply bg-white border border-gray-100 rounded-std shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden;
+  }
+  
+  .input {
+    @apply block w-full rounded-std border-gray-200 bg-white px-4 py-2.5 shadow-sm focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-sm outline-none placeholder:text-gray-400;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider;
+  }
+
+  /* Custom Layout Utilities */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-6 md:px-10;
+  }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 rounded-std shadow-xl;
+  }
+
+  .label {
+    @apply block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-200 rounded-full hover:bg-gray-400 transition-colors;
+}
+
+/* Print Utilities */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\giuli\\\\Documents\\\\fdos-project-manager\\\\src\" -Recurse -File)",
+      "Bash(Select-Object FullName)",
+      "Bash(node --input-type=module --experimental-vm-modules scripts/generate-icons.js)",
+      "Bash(node scripts/generate-icons.js)",
+      "Bash(npx tsc *)",
+      "Bash(npx cross-env *)",
+      "Bash(npx electron *)",
+      "Bash(npx electron-builder *)",
+      "Bash(npx asar *)",
+      "Bash(grep -E \"^\\\\\\\\\\\\\\\\\\(electron|dist|package\\)\")",
+      "Bash(rm -rf \"C:/Users/giuli/AppData/Local/electron-builder/Cache/winCodeSign/\" 2>&1 && echo \"Cache cleared\")",
+      "WebFetch(domain:app.contentboard.com.ar)",
+      "WebSearch",
+      "Bash(not exist *)",
+      "PowerShell(New-Item -ItemType Directory -Path \"C:\\\\Users\\\\giuli\\\\Documents\\\\fdos-project-manager\\\\src\\\\components\\\\cm\" -Force)",
+      "Bash(npx vite *)",
+      "Bash(node -e \"const l = require\\('lucide-react'\\); console.log\\(Object.keys\\(l\\).filter\\(k => k.toLowerCase\\(\\).includes\\('kanban'\\) || k.toLowerCase\\(\\).includes\\('layout'\\) || k.toLowerCase\\(\\).includes\\('columns'\\)\\)\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "Bash(netstat -ano)",
+      "Bash(findstr \"LISTEN\")",
+      "Bash(findstr \":51\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5200)",
+      "Bash(powershell -Command \"\\(Get-Content package.json\\) -replace 'gestrix','atout' -replace 'Gestrix','Atout' | Set-Content package.json -Encoding utf8\")",
+      "Bash(node -e ' *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5174)",
+      "Bash(grep -o \"ace-of-diamonds\" \"/c/Users/giuli/.claude/projects/C--Users-giuli-Documents-fdos-project-manager/619e5f7c-041c-4fe9-a640-c0d809f53432.jsonl\" | wc -l)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}
