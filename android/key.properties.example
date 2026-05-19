@@ -1,0 +1,7 @@
+# Copiá este archivo como key.properties (NO commitear key.properties)
+# Generá el keystore con: npm run android:keystore
+
+storeFile=../atout-release.keystore
+storePassword=TU_STORE_PASSWORD
+keyAlias=atout
+keyPassword=TU_KEY_PASSWORD

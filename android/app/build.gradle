@@ -1,31 +1,68 @@
+// ── Signing config ────────────────────────────────────────────────────────────
+// Local: lee desde android/key.properties (no commitear)
+// CI: lee desde env vars (GitHub Secrets: ANDROID_KEY_ALIAS, etc.)
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 apply plugin: 'com.android.application'
 
 android {
     namespace = "com.atout.app"
     compileSdk = rootProject.ext.compileSdkVersion
+
     defaultConfig {
         applicationId "com.atout.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
-             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
-             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    buildTypes {
+
+    signingConfigs {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // Prioridad: key.properties local → variables de entorno (CI)
+            def alias    = keystoreProperties['keyAlias']    ?: System.getenv('ANDROID_KEY_ALIAS')
+            def keyPass  = keystoreProperties['keyPassword'] ?: System.getenv('ANDROID_KEY_PASSWORD')
+            def storePass = keystoreProperties['storePassword'] ?: System.getenv('ANDROID_STORE_PASSWORD')
+            def storeF   = keystoreProperties['storeFile']   ?: System.getenv('ANDROID_STORE_FILE')
+
+            if (alias && keyPass && storePass && storeF) {
+                keyAlias alias
+                keyPassword keyPass
+                storeFile file(storeF)
+                storePassword storePass
+            }
         }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 
 repositories {
-    flatDir{
+    flatDir {
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
     }
 }
@@ -50,5 +87,5 @@ try {
         apply plugin: 'com.google.gms.google-services'
     }
 } catch(Exception e) {
-    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+    logger.info("google-services.json not found, push notifications won't work")
 }
