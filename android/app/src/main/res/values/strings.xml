@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Atout</string>
+    <string name="title_activity_main">Atout</string>
+    <string name="package_name">com.atout.app</string>
+    <string name="custom_url_scheme">com.atout.app</string>
+</resources>

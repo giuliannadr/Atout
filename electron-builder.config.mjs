@@ -1,14 +1,12 @@
 /** @type {import('electron-builder').Configuration} */
 export default {
-  appId: 'com.gestrix.app',
-  productName: 'Gestrix',
-  copyright: 'Copyright © 2025',
+  appId: 'com.atout.app',
+  productName: 'Atout',
+  copyright: `Copyright © ${new Date().getFullYear()} Atout`,
 
-  // Sin ASAR para evitar el paso de integrity patching que requiere winCodeSign
-  // El contenido del app igualmente está protegido por el empaquetado del instalador
   asar: false,
 
-  // Solo el proceso principal — las deps de React ya están en dist/ (bundleadas por Vite)
+  // Solo el proceso principal — React ya está bundleado en dist/ por Vite
   files: [
     'electron/main.mjs',
     'package.json',
@@ -17,9 +15,11 @@ export default {
     '!.github/**/*',
     '!scripts/**/*',
     '!public/**/*',
+    '!android/**/*',
+    '!ios/**/*',
   ],
 
-  // El build de Vite se incluye como recursos extra (no lo toca electron-builder)
+  // El build de Vite se incluye como recurso extra
   extraResources: [
     {
       from: 'dist',
@@ -28,17 +28,15 @@ export default {
     },
   ],
 
-  // Directorio de salida
   directories: {
     output: 'release',
     buildResources: 'build-assets',
   },
 
-  // Windows: genera un instalador .exe con wizard de instalación
+  // Windows → instalador NSIS
   win: {
     target: [{ target: 'nsis', arch: ['x64'] }],
     icon: 'public/icons/icon-512.png',
-    // Sin certificado de firma: configurar CSC_LINK cuando tengas un certificado
     forceCodeSigning: false,
   },
   nsis: {
@@ -46,33 +44,35 @@ export default {
     allowToChangeInstallationDirectory: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
-    shortcutName: 'Gestrix',
+    shortcutName: 'Atout',
     installerIcon: 'public/icons/icon-512.png',
     uninstallerIcon: 'public/icons/icon-512.png',
   },
 
-  // Mac: genera un .dmg
+  // Mac → .dmg universal (Intel + Apple Silicon)
   mac: {
     target: [{ target: 'dmg', arch: ['x64', 'arm64'] }],
     icon: 'public/icons/icon-512.png',
     category: 'public.app-category.productivity',
   },
   dmg: {
-    title: 'Gestrix',
-    backgroundColor: '#f9fafb',
+    title: 'Atout',
+    backgroundColor: '#F8F6FF',
   },
 
-  // Linux: genera AppImage (portable, no requiere instalación)
+  // Linux → AppImage portable
   linux: {
     target: [{ target: 'AppImage', arch: ['x64'] }],
     icon: 'public/icons/icon-512.png',
     category: 'Office',
+    description: 'Atout — Tu estudio freelance, organizado.',
   },
 
-  // Publish: configurar si querés auto-update desde GitHub Releases
-  // publish: {
-  //   provider: 'github',
-  //   owner: 'tu-usuario',
-  //   repo: 'fdos-project-manager',
-  // },
+  // Auto-update desde GitHub Releases (activar con GH_TOKEN)
+  publish: {
+    provider: 'github',
+    owner: 'giuliannadr',
+    repo: 'Atout',
+    releaseType: 'release',
+  },
 }

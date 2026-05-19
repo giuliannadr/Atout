@@ -1,36 +1,57 @@
-# Dependencies
+# ── Dependencies ──────────────────────────────────────────────────────────────
 node_modules
 
-# Build output
+# ── Build output ───────────────────────────────────────────────────────────────
 dist
 dist-ssr
 
-# Environment variables (NUNCA subir al repo)
+# ── Environment variables (NUNCA subir al repo) ────────────────────────────────
 .env
 .env.local
 .env.*.local
 
-# Electron build output
+# ── Electron build output ─────────────────────────────────────────────────────
 release/
 
-# Vercel
+# ── Android (Capacitor) ───────────────────────────────────────────────────────
+# Los proyectos nativos SE commitean, solo excluimos artefactos de build
+android/.gradle
+android/app/build
+android/local.properties
+android/key.properties
+android/keystores/
+*.keystore
+!debug.keystore
+*.jks
+
+# ── iOS (Capacitor) ───────────────────────────────────────────────────────────
+# Los proyectos nativos SE commitean, solo excluimos Pods y datos de usuario
+ios/App/Pods
+ios/App/App.xcworkspace/xcuserdata
+ios/App/App.xcodeproj/xcuserdata
+ios/.xcode.env.local
+*.ipa
+DerivedData/
+
+# ── Vercel ────────────────────────────────────────────────────────────────────
 .vercel
 
-# Editor
+# ── Editor ────────────────────────────────────────────────────────────────────
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
 
-# Logs
+# ── Logs ──────────────────────────────────────────────────────────────────────
 *.log
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 
-# OS
+# ── OS ────────────────────────────────────────────────────────────────────────
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+Thumbs.db
