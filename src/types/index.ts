@@ -68,6 +68,27 @@ export interface ContentPost {
   performanceComments?: number;
   performanceNotes?: string;
   contentPillar?: string;
+  coverImage?: string;      // URL to cover/preview image
+  inspoLinks?: string[];    // inspiration reference URLs
+  mediaUrls?: string[];     // asset/media URLs
+  category?: string;        // e.g. "Educativo", "Promocional", "Lifestyle"
+}
+
+export interface CalendarComment {
+  id: string;
+  projectId: string;
+  authorName: string;
+  content: string;
+  targetDate?: string; // "YYYY-MM-DD", undefined = general comment
+  createdAt: string;
+  isRead?: boolean;
+}
+
+export interface CMCalendarShare {
+  enabled: boolean;
+  sharedMonths: string[] | 'all'; // ["2025-01", "2025-02"] or 'all'
+  clientName?: string;
+  createdAt: string;
 }
 
 export interface CMCampaign {
@@ -196,6 +217,8 @@ export interface Project {
   assignedMembers?: string[];
   tasks?: Task[];
   changeRequests?: ChangeRequest[];
+  cmCalendarShare?: CMCalendarShare;
+  calendarComments?: CalendarComment[];
 }
 
 export interface Phase {

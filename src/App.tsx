@@ -15,6 +15,7 @@ import Settings from './pages/Settings';
 import Auth from './pages/Auth';
 import BookingPage from './pages/BookingPage';
 import CalendarPage from './pages/CalendarPage';
+import SharedCalendarPage from './pages/SharedCalendarPage';
 import ToastContainer from './components/layout/ToastContainer';
 import OnboardingModal from './components/layout/OnboardingModal';
 import AuthGuard from './components/layout/AuthGuard';
@@ -152,6 +153,7 @@ function App() {
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/project/:id/client-view" element={<ClientView />} />
         <Route path="/book/:slug" element={<BookingPage />} />
+        <Route path="/calendar/share/:projectId" element={<SharedCalendarPage />} />
 
         <Route
           path="/"

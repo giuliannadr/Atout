@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, Link, Hash, AlignLeft, Repeat, BarChart2, FileImage, AlertTriangle, ThumbsUp } from 'lucide-react';
+import { Calendar, Clock, Link, Hash, AlignLeft, Repeat, BarChart2, FileImage, AlertTriangle, ThumbsUp, Image, Tag } from 'lucide-react';
 import type { ContentPost, CMHashtagGroup, PostPriority, ApprovalStatus } from '../../types';
 
 const PLATFORMS = ['Instagram', 'TikTok', 'Facebook', 'LinkedIn', 'YouTube', 'Pinterest', 'Twitter/X'];
@@ -70,6 +70,10 @@ const PostForm: React.FC<PostFormProps> = ({
     performanceLikes: post?.performanceLikes ?? 0,
     performanceComments: post?.performanceComments ?? 0,
     performanceNotes: post?.performanceNotes ?? '',
+    coverImage: post?.coverImage ?? '',
+    inspoLinks: post?.inspoLinks?.join('\n') ?? '',
+    mediaUrls: post?.mediaUrls?.join('\n') ?? '',
+    category: post?.category ?? '',
   } as {
     platforms: string[];
     type: typeof POST_TYPES[number]['value'];
@@ -90,6 +94,10 @@ const PostForm: React.FC<PostFormProps> = ({
     performanceLikes: number;
     performanceComments: number;
     performanceNotes: string;
+    coverImage: string;
+    inspoLinks: string;
+    mediaUrls: string;
+    category: string;
   });
 
   const [tab, setTab] = useState<'content' | 'performance'>('content');
@@ -136,6 +144,14 @@ const PostForm: React.FC<PostFormProps> = ({
       performanceLikes: form.performanceLikes || undefined,
       performanceComments: form.performanceComments || undefined,
       performanceNotes: form.performanceNotes || undefined,
+      coverImage: form.coverImage.trim() || undefined,
+      inspoLinks: form.inspoLinks.trim()
+        ? form.inspoLinks.split('\n').map(s => s.trim()).filter(Boolean)
+        : undefined,
+      mediaUrls: form.mediaUrls.trim()
+        ? form.mediaUrls.split('\n').map(s => s.trim()).filter(Boolean)
+        : undefined,
+      category: form.category.trim() || undefined,
     });
   };
 
@@ -182,7 +198,7 @@ const PostForm: React.FC<PostFormProps> = ({
           </div>
 
           {/* Type + Status */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="label">Tipo</label>
               <select
@@ -210,7 +226,7 @@ const PostForm: React.FC<PostFormProps> = ({
           </div>
 
           {/* Priority + Approval */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="label flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Prioridad</label>
               <div className="flex flex-wrap gap-1.5">
@@ -241,7 +257,7 @@ const PostForm: React.FC<PostFormProps> = ({
           </div>
 
           {/* Date + Time */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="label flex items-center gap-1"><Calendar className="w-3 h-3" /> Fecha *</label>
               <input
@@ -300,6 +316,54 @@ const PostForm: React.FC<PostFormProps> = ({
               onChange={e => setForm(p => ({ ...p, link: e.target.value }))}
               placeholder="https://canva.com/..."
               className="input"
+            />
+          </div>
+
+          {/* Cover image URL */}
+          <div>
+            <label className="label flex items-center gap-1"><Image className="w-3 h-3" /> URL imagen de portada</label>
+            <input
+              type="url"
+              value={form.coverImage}
+              onChange={e => setForm(p => ({ ...p, coverImage: e.target.value }))}
+              placeholder="https://..."
+              className="input"
+            />
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="label flex items-center gap-1"><Tag className="w-3 h-3" /> Categoría</label>
+            <input
+              type="text"
+              value={form.category}
+              onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
+              placeholder="Ej: Educativo, Promocional, Lifestyle..."
+              className="input"
+            />
+          </div>
+
+          {/* Inspo links */}
+          <div>
+            <label className="label flex items-center gap-1"><Link className="w-3 h-3" /> Links de inspiración (uno por línea)</label>
+            <textarea
+              value={form.inspoLinks}
+              onChange={e => setForm(p => ({ ...p, inspoLinks: e.target.value }))}
+              rows={2}
+              placeholder="https://ejemplo.com/referencia&#10;https://otro.com/referencia"
+              className="input resize-none"
+            />
+          </div>
+
+          {/* Media URLs */}
+          <div>
+            <label className="label flex items-center gap-1"><FileImage className="w-3 h-3" /> URLs de archivos/medios (uno por línea)</label>
+            <textarea
+              value={form.mediaUrls}
+              onChange={e => setForm(p => ({ ...p, mediaUrls: e.target.value }))}
+              rows={2}
+              placeholder="https://drive.google.com/archivo&#10;https://otro-archivo.com"
+              className="input resize-none"
             />
           </div>
 
@@ -388,7 +452,7 @@ const PostForm: React.FC<PostFormProps> = ({
           <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 text-xs text-amber-700">
             Completá estas métricas después de publicar el contenido para llevar un registro de rendimiento.
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               { key: 'performanceReach', label: 'Alcance' },
               { key: 'performanceLikes', label: 'Likes' },

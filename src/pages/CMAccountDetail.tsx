@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Calendar, Kanban, BarChart2,
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Topbar from '../components/layout/Topbar';
 import ContentCalendar from '../components/cm/ContentCalendar';
+import CalendarShareModal from '../components/cm/CalendarShareModal';
 import KanbanBoard from '../components/cm/KanbanBoard';
 import MetricsPanel from '../components/cm/MetricsPanel';
 import CampaignTracker from '../components/cm/CampaignTracker';
@@ -22,8 +23,10 @@ import {
   validateToken,
   type MetaIGAccount,
 } from '../services/metaApi';
+import { CalendarCommentsAPI } from '../api/calendarComments';
 import type {
   ContentPost, CMMetrics, CMCampaign, CMHashtagGroup, CMMonthlyFee, CMBrandConfig, CMMetaConnection, Task,
+  CMCalendarShare, CalendarComment,
 } from '../types';
 
 const PLATFORM_COLORS: Record<string, string> = {
@@ -74,6 +77,8 @@ const CMAccountDetail: React.FC = () => {
   const { settings } = useSettingsStore();
   const account = id ? getProject(id) : undefined;
   const [activeTab, setActiveTab] = useState<TabKey>('calendar');
+  const [calendarComments, setCalendarComments] = useState<CalendarComment[]>([]);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   const [editingConfig, setEditingConfig] = useState(false);
   const [configForm, setConfigForm] = useState<CMBrandConfig>(account?.cmBrandConfig ?? DEFAULT_BRAND_CONFIG);
   const [newPillar, setNewPillar] = useState('');
@@ -87,6 +92,25 @@ const CMAccountDetail: React.FC = () => {
   const [metaLoading, setMetaLoading] = useState(false);
   const [metaError, setMetaError] = useState<string | null>(null);
   const [metaSuccess, setMetaSuccess] = useState<string | null>(null);
+
+  // Load calendar comments on mount
+  useEffect(() => {
+    if (!id) return;
+    CalendarCommentsAPI.fetchForProject(id)
+      .then(setCalendarComments)
+      .catch(() => { /* non-critical — ignore */ });
+  }, [id]);
+
+  const handleSaveShare = (share: CMCalendarShare) => {
+    updateProject(id!, { cmCalendarShare: share });
+  };
+
+  const handleMarkCommentsRead = async (ids: string[]) => {
+    try {
+      await CalendarCommentsAPI.markAsRead(ids);
+      setCalendarComments(prev => prev.map(c => ids.includes(c.id) ? { ...c, isRead: true } : c));
+    } catch { /* non-critical */ }
+  };
 
   if (!account) {
     return (
@@ -302,21 +326,21 @@ const CMAccountDetail: React.FC = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 overflow-x-auto border-b border-gray-200 mb-6 pb-0">
+        <div className="flex gap-0.5 overflow-x-auto border-b border-gray-200 mb-6 pb-0 scrollbar-none">
           {TABS.map(tab => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold whitespace-nowrap border-b-2 transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-bold whitespace-nowrap border-b-2 transition-all ${
                   activeTab === tab.key
                     ? 'border-violet-500 text-violet-600'
                     : 'border-transparent text-gray-400 hover:text-gray-600'
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                {tab.label}
+                <Icon className="w-4 h-4 shrink-0" />
+                <span className="hidden sm:inline">{tab.label}</span>
               </button>
             );
           })}
@@ -325,15 +349,28 @@ const CMAccountDetail: React.FC = () => {
         {/* Tab content */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6">
           {activeTab === 'calendar' && (
-            <ContentCalendar
-              posts={posts}
-              hashtagGroups={hashtagGroups}
-              contentPillars={brandConfig.contentPillars}
-              accountName={account.name}
-              onAddPost={addPost}
-              onUpdatePost={updatePost}
-              onDeletePost={deletePost}
-            />
+            <>
+              <ContentCalendar
+                posts={posts}
+                hashtagGroups={hashtagGroups}
+                contentPillars={brandConfig.contentPillars}
+                accountName={account.name}
+                onAddPost={addPost}
+                onUpdatePost={updatePost}
+                onDeletePost={deletePost}
+                comments={calendarComments}
+                onOpenShare={() => setShareModalOpen(true)}
+              />
+              <CalendarShareModal
+                isOpen={shareModalOpen}
+                onClose={() => setShareModalOpen(false)}
+                projectId={id!}
+                currentShare={account.cmCalendarShare}
+                comments={calendarComments}
+                onSave={handleSaveShare}
+                onMarkCommentsRead={handleMarkCommentsRead}
+              />
+            </>
           )}
 
           {activeTab === 'pipeline' && (
