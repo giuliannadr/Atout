@@ -98,7 +98,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
               {/* Cards */}
               <div className="space-y-2 min-h-[120px]">
                 {colPosts.map(post => {
-                  const platform = post.platforms?.[0] ?? post.platform;
                   const allPlatforms = post.platforms ?? [post.platform];
 
                   return (
