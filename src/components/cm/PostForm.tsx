@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, Link, Hash, AlignLeft, Repeat, BarChart2, FileImage, AlertTriangle, ThumbsUp, Image, Tag } from 'lucide-react';
+import {
+  Calendar, Clock, Link, Hash, AlignLeft, Repeat,
+  BarChart2, FileImage, AlertTriangle, ThumbsUp, Tag,
+} from 'lucide-react';
 import type { ContentPost, CMHashtagGroup, PostPriority, ApprovalStatus } from '../../types';
+import MediaUploader from '../ui/MediaUploader';
+import { ACCEPTED_TYPES } from '../../services/storageService';
 
 const PLATFORMS = ['Instagram', 'TikTok', 'Facebook', 'LinkedIn', 'YouTube', 'Pinterest', 'Twitter/X'];
 
@@ -17,19 +22,27 @@ const APPROVAL_OPTIONS: { value: ApprovalStatus; label: string }[] = [
   { value: 'approved',         label: 'Aprobado ✓' },
   { value: 'rejected',         label: 'Rechazado ✗' },
 ];
+
 const POST_TYPES = [
-  { value: 'post', label: 'Post' },
-  { value: 'reel', label: 'Reel' },
-  { value: 'story', label: 'Story' },
+  { value: 'post',     label: 'Post' },
+  { value: 'reel',     label: 'Reel' },
+  { value: 'story',    label: 'Story' },
   { value: 'carousel', label: 'Carousel' },
-  { value: 'otro', label: 'Otro' },
+  { value: 'otro',     label: 'Otro' },
 ] as const;
 
 const STATUS_OPTIONS = [
-  { value: 'draft', label: 'Borrador', color: 'bg-gray-100 text-gray-600' },
+  { value: 'draft',     label: 'Borrador',   color: 'bg-gray-100 text-gray-600' },
   { value: 'scheduled', label: 'Programado', color: 'bg-amber-100 text-amber-700' },
-  { value: 'published', label: 'Publicado', color: 'bg-emerald-100 text-emerald-700' },
+  { value: 'published', label: 'Publicado',  color: 'bg-emerald-100 text-emerald-700' },
 ] as const;
+
+const IMAGE_ACCEPT = ACCEPTED_TYPES.image.join(',');
+const MEDIA_ACCEPT = [
+  ...ACCEPTED_TYPES.image,
+  ...ACCEPTED_TYPES.video,
+  ...ACCEPTED_TYPES.doc,
+].join(',');
 
 interface PostFormProps {
   post?: Partial<ContentPost>;
@@ -51,29 +64,30 @@ const PostForm: React.FC<PostFormProps> = ({
   const isEditing = Boolean(post?.id);
 
   const [form, setForm] = useState({
-    platforms: post?.platforms ?? (post?.platform ? [post.platform] : ['Instagram']),
-    type: post?.type ?? 'post',
-    date: post?.date ?? defaultDate ?? new Date().toISOString().split('T')[0],
-    time: post?.time ?? '',
-    caption: post?.caption ?? '',
-    contentNote: post?.contentNote ?? '',
-    link: post?.link ?? '',
-    inlineHashtags: post?.inlineHashtags ?? '',
-    hashtagGroupIds: post?.hashtagGroupIds ?? [],
-    contentPillar: post?.contentPillar ?? '',
-    status: post?.status ?? 'draft',
-    priority: post?.priority ?? 'normal',
-    approvalStatus: post?.approvalStatus ?? 'none',
-    isRecurring: post?.isRecurring ?? false,
-    recurringFrequency: post?.recurringFrequency ?? 'weekly',
-    performanceReach: post?.performanceReach ?? 0,
-    performanceLikes: post?.performanceLikes ?? 0,
+    platforms:           post?.platforms ?? (post?.platform ? [post.platform] : ['Instagram']),
+    type:                post?.type ?? 'post',
+    date:                post?.date ?? defaultDate ?? new Date().toISOString().split('T')[0],
+    time:                post?.time ?? '',
+    caption:             post?.caption ?? '',
+    contentNote:         post?.contentNote ?? '',
+    link:                post?.link ?? '',
+    inlineHashtags:      post?.inlineHashtags ?? '',
+    hashtagGroupIds:     post?.hashtagGroupIds ?? [],
+    contentPillar:       post?.contentPillar ?? '',
+    status:              post?.status ?? 'draft',
+    priority:            post?.priority ?? 'normal',
+    approvalStatus:      post?.approvalStatus ?? 'none',
+    isRecurring:         post?.isRecurring ?? false,
+    recurringFrequency:  post?.recurringFrequency ?? 'weekly',
+    performanceReach:    post?.performanceReach ?? 0,
+    performanceLikes:    post?.performanceLikes ?? 0,
     performanceComments: post?.performanceComments ?? 0,
-    performanceNotes: post?.performanceNotes ?? '',
-    coverImage: post?.coverImage ?? '',
-    inspoLinks: post?.inspoLinks?.join('\n') ?? '',
-    mediaUrls: post?.mediaUrls?.join('\n') ?? '',
-    category: post?.category ?? '',
+    performanceNotes:    post?.performanceNotes ?? '',
+    // Media — stored as arrays of URLs
+    coverImage:   post?.coverImage  ? [post.coverImage]  : [] as string[],
+    mediaUrls:    post?.mediaUrls   ?? [] as string[],
+    inspoLinks:   post?.inspoLinks  ?? [] as string[],
+    category:     post?.category    ?? '',
   } as {
     platforms: string[];
     type: typeof POST_TYPES[number]['value'];
@@ -94,64 +108,58 @@ const PostForm: React.FC<PostFormProps> = ({
     performanceLikes: number;
     performanceComments: number;
     performanceNotes: string;
-    coverImage: string;
-    inspoLinks: string;
-    mediaUrls: string;
+    coverImage: string[];
+    mediaUrls: string[];
+    inspoLinks: string[];
     category: string;
   });
 
-  const [tab, setTab] = useState<'content' | 'performance'>('content');
+  const [tab, setTab] = useState<'content' | 'media' | 'performance'>('content');
 
-  const togglePlatform = (p: string) => {
+  const togglePlatform = (p: string) =>
     setForm(prev => ({
       ...prev,
       platforms: prev.platforms.includes(p)
         ? prev.platforms.filter(x => x !== p)
         : [...prev.platforms, p],
     }));
-  };
 
-  const toggleGroup = (id: string) => {
+  const toggleGroup = (id: string) =>
     setForm(prev => ({
       ...prev,
       hashtagGroupIds: prev.hashtagGroupIds.includes(id)
         ? prev.hashtagGroupIds.filter(x => x !== id)
         : [...prev.hashtagGroupIds, id],
     }));
-  };
 
   const handleSave = () => {
     if (!form.caption.trim() || form.platforms.length === 0 || !form.date) return;
     onSave({
-      id: post?.id ?? crypto.randomUUID(),
-      platform: form.platforms[0],
-      platforms: form.platforms,
-      type: form.type,
-      date: form.date,
-      time: form.time || undefined,
-      caption: form.caption,
-      contentNote: form.contentNote || undefined,
-      link: form.link || undefined,
-      inlineHashtags: form.inlineHashtags || undefined,
-      hashtagGroupIds: form.hashtagGroupIds.length ? form.hashtagGroupIds : undefined,
-      contentPillar: form.contentPillar || undefined,
-      status: form.status,
-      priority: form.priority,
-      approvalStatus: form.approvalStatus !== 'none' ? form.approvalStatus : undefined,
-      isRecurring: form.isRecurring || undefined,
-      recurringFrequency: form.isRecurring ? form.recurringFrequency : undefined,
-      performanceReach: form.performanceReach || undefined,
-      performanceLikes: form.performanceLikes || undefined,
-      performanceComments: form.performanceComments || undefined,
-      performanceNotes: form.performanceNotes || undefined,
-      coverImage: form.coverImage.trim() || undefined,
-      inspoLinks: form.inspoLinks.trim()
-        ? form.inspoLinks.split('\n').map(s => s.trim()).filter(Boolean)
-        : undefined,
-      mediaUrls: form.mediaUrls.trim()
-        ? form.mediaUrls.split('\n').map(s => s.trim()).filter(Boolean)
-        : undefined,
-      category: form.category.trim() || undefined,
+      id:                   post?.id ?? crypto.randomUUID(),
+      platform:             form.platforms[0],
+      platforms:            form.platforms,
+      type:                 form.type,
+      date:                 form.date,
+      time:                 form.time || undefined,
+      caption:              form.caption,
+      contentNote:          form.contentNote || undefined,
+      link:                 form.link || undefined,
+      inlineHashtags:       form.inlineHashtags || undefined,
+      hashtagGroupIds:      form.hashtagGroupIds.length ? form.hashtagGroupIds : undefined,
+      contentPillar:        form.contentPillar || undefined,
+      status:               form.status,
+      priority:             form.priority,
+      approvalStatus:       form.approvalStatus !== 'none' ? form.approvalStatus : undefined,
+      isRecurring:          form.isRecurring || undefined,
+      recurringFrequency:   form.isRecurring ? form.recurringFrequency : undefined,
+      performanceReach:     form.performanceReach || undefined,
+      performanceLikes:     form.performanceLikes || undefined,
+      performanceComments:  form.performanceComments || undefined,
+      performanceNotes:     form.performanceNotes || undefined,
+      coverImage:           form.coverImage[0] || undefined,
+      mediaUrls:            form.mediaUrls.length ? form.mediaUrls : undefined,
+      inspoLinks:           form.inspoLinks.length ? form.inspoLinks : undefined,
+      category:             form.category.trim() || undefined,
     });
   };
 
@@ -161,19 +169,24 @@ const PostForm: React.FC<PostFormProps> = ({
     <div className="flex flex-col gap-5 max-h-[80vh] overflow-y-auto pr-1">
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
-        {(['content', 'performance'] as const).map(t => (
+        {([
+          { key: 'content',     label: 'Contenido' },
+          { key: 'media',       label: 'Multimedia' },
+          { key: 'performance', label: 'Performance' },
+        ] as const).map(t => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
+            key={t.key}
+            onClick={() => setTab(t.key)}
             className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-              tab === t ? 'bg-white text-dark shadow-sm' : 'text-gray-400 hover:text-gray-600'
+              tab === t.key ? 'bg-white text-dark shadow-sm' : 'text-gray-400 hover:text-gray-600'
             }`}
           >
-            {t === 'content' ? 'Contenido' : 'Performance'}
+            {t.label}
           </button>
         ))}
       </div>
 
+      {/* ── CONTENT TAB ── */}
       {tab === 'content' && (
         <>
           {/* Platforms */}
@@ -206,9 +219,7 @@ const PostForm: React.FC<PostFormProps> = ({
                 onChange={e => setForm(p => ({ ...p, type: e.target.value as typeof form.type }))}
                 className="input"
               >
-                {POST_TYPES.map(t => (
-                  <option key={t.value} value={t.value}>{t.label}</option>
-                ))}
+                {POST_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
             </div>
             <div>
@@ -218,9 +229,7 @@ const PostForm: React.FC<PostFormProps> = ({
                 onChange={e => setForm(p => ({ ...p, status: e.target.value as typeof form.status }))}
                 className="input"
               >
-                {STATUS_OPTIONS.map(s => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
-                ))}
+                {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
           </div>
@@ -228,7 +237,9 @@ const PostForm: React.FC<PostFormProps> = ({
           {/* Priority + Approval */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="label flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Prioridad</label>
+              <label className="label flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3" /> Prioridad
+              </label>
               <div className="flex flex-wrap gap-1.5">
                 {PRIORITIES.map(p => (
                   <button
@@ -245,7 +256,9 @@ const PostForm: React.FC<PostFormProps> = ({
               </div>
             </div>
             <div>
-              <label className="label flex items-center gap-1"><ThumbsUp className="w-3 h-3" /> Aprobación</label>
+              <label className="label flex items-center gap-1">
+                <ThumbsUp className="w-3 h-3" /> Aprobación
+              </label>
               <select
                 value={form.approvalStatus}
                 onChange={e => setForm(prev => ({ ...prev, approvalStatus: e.target.value as ApprovalStatus }))}
@@ -259,7 +272,9 @@ const PostForm: React.FC<PostFormProps> = ({
           {/* Date + Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="label flex items-center gap-1"><Calendar className="w-3 h-3" /> Fecha *</label>
+              <label className="label flex items-center gap-1">
+                <Calendar className="w-3 h-3" /> Fecha *
+              </label>
               <input
                 type="date"
                 value={form.date}
@@ -268,7 +283,9 @@ const PostForm: React.FC<PostFormProps> = ({
               />
             </div>
             <div>
-              <label className="label flex items-center gap-1"><Clock className="w-3 h-3" /> Hora</label>
+              <label className="label flex items-center gap-1">
+                <Clock className="w-3 h-3" /> Hora de publicación
+              </label>
               <input
                 type="time"
                 value={form.time}
@@ -278,11 +295,27 @@ const PostForm: React.FC<PostFormProps> = ({
             </div>
           </div>
 
+          {/* Category */}
+          <div>
+            <label className="label flex items-center gap-1">
+              <Tag className="w-3 h-3" /> Categoría
+            </label>
+            <input
+              type="text"
+              value={form.category}
+              onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
+              placeholder="Ej: Educativo, Promocional, Lifestyle…"
+              className="input"
+            />
+          </div>
+
           {/* Caption */}
           <div>
             <label className="label flex items-center justify-between">
-              <span className="flex items-center gap-1"><AlignLeft className="w-3 h-3" /> Caption *</span>
-              <span className={`font-mono text-[10px] ${captionLen > 2200 ? 'text-danger' : 'text-gray-400'}`}>
+              <span className="flex items-center gap-1">
+                <AlignLeft className="w-3 h-3" /> Caption *
+              </span>
+              <span className={`font-mono text-[10px] ${captionLen > 2200 ? 'text-red-500' : 'text-gray-400'}`}>
                 {captionLen}/2200
               </span>
             </label>
@@ -290,86 +323,44 @@ const PostForm: React.FC<PostFormProps> = ({
               value={form.caption}
               onChange={e => setForm(p => ({ ...p, caption: e.target.value }))}
               rows={4}
-              placeholder="Escribí el caption del post..."
+              placeholder="Escribí el caption del post…"
               className="input resize-none"
             />
           </div>
 
           {/* Content note */}
           <div>
-            <label className="label flex items-center gap-1"><FileImage className="w-3 h-3" /> Descripción del arte/video</label>
+            <label className="label flex items-center gap-1">
+              <FileImage className="w-3 h-3" /> Descripción del arte / video
+            </label>
             <input
               type="text"
               value={form.contentNote}
               onChange={e => setForm(p => ({ ...p, contentNote: e.target.value }))}
-              placeholder="Ej: Foto del producto fondo blanco, con texto overlay..."
+              placeholder="Ej: Foto del producto fondo blanco, texto overlay…"
               className="input"
             />
           </div>
 
-          {/* Link */}
+          {/* Link al asset */}
           <div>
-            <label className="label flex items-center gap-1"><Link className="w-3 h-3" /> Link al asset (Canva / Drive)</label>
+            <label className="label flex items-center gap-1">
+              <Link className="w-3 h-3" /> Link al asset (Canva / Drive)
+            </label>
             <input
               type="url"
               value={form.link}
               onChange={e => setForm(p => ({ ...p, link: e.target.value }))}
-              placeholder="https://canva.com/..."
+              placeholder="https://canva.com/…"
               className="input"
-            />
-          </div>
-
-          {/* Cover image URL */}
-          <div>
-            <label className="label flex items-center gap-1"><Image className="w-3 h-3" /> URL imagen de portada</label>
-            <input
-              type="url"
-              value={form.coverImage}
-              onChange={e => setForm(p => ({ ...p, coverImage: e.target.value }))}
-              placeholder="https://..."
-              className="input"
-            />
-          </div>
-
-          {/* Category */}
-          <div>
-            <label className="label flex items-center gap-1"><Tag className="w-3 h-3" /> Categoría</label>
-            <input
-              type="text"
-              value={form.category}
-              onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
-              placeholder="Ej: Educativo, Promocional, Lifestyle..."
-              className="input"
-            />
-          </div>
-
-          {/* Inspo links */}
-          <div>
-            <label className="label flex items-center gap-1"><Link className="w-3 h-3" /> Links de inspiración (uno por línea)</label>
-            <textarea
-              value={form.inspoLinks}
-              onChange={e => setForm(p => ({ ...p, inspoLinks: e.target.value }))}
-              rows={2}
-              placeholder="https://ejemplo.com/referencia&#10;https://otro.com/referencia"
-              className="input resize-none"
-            />
-          </div>
-
-          {/* Media URLs */}
-          <div>
-            <label className="label flex items-center gap-1"><FileImage className="w-3 h-3" /> URLs de archivos/medios (uno por línea)</label>
-            <textarea
-              value={form.mediaUrls}
-              onChange={e => setForm(p => ({ ...p, mediaUrls: e.target.value }))}
-              rows={2}
-              placeholder="https://drive.google.com/archivo&#10;https://otro-archivo.com"
-              className="input resize-none"
             />
           </div>
 
           {/* Hashtags */}
           <div>
-            <label className="label flex items-center gap-1"><Hash className="w-3 h-3" /> Hashtags</label>
+            <label className="label flex items-center gap-1">
+              <Hash className="w-3 h-3" /> Hashtags
+            </label>
             {hashtagGroups.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
                 {hashtagGroups.map(g => (
@@ -392,7 +383,7 @@ const PostForm: React.FC<PostFormProps> = ({
               type="text"
               value={form.inlineHashtags}
               onChange={e => setForm(p => ({ ...p, inlineHashtags: e.target.value }))}
-              placeholder="#marca #producto #lifestyle..."
+              placeholder="#marca #producto #lifestyle…"
               className="input"
             />
           </div>
@@ -406,7 +397,10 @@ const PostForm: React.FC<PostFormProps> = ({
                   <button
                     key={pillar}
                     type="button"
-                    onClick={() => setForm(p => ({ ...p, contentPillar: p.contentPillar === pillar ? '' : pillar }))}
+                    onClick={() => setForm(p => ({
+                      ...p,
+                      contentPillar: p.contentPillar === pillar ? '' : pillar,
+                    }))}
                     className={`text-xs px-3 py-1 rounded-full border transition-all ${
                       form.contentPillar === pillar
                         ? 'border-violet-500 bg-violet-50 text-violet-700 font-bold'
@@ -421,7 +415,7 @@ const PostForm: React.FC<PostFormProps> = ({
           )}
 
           {/* Recurring */}
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl flex-wrap">
             <input
               type="checkbox"
               id="recurring"
@@ -435,8 +429,11 @@ const PostForm: React.FC<PostFormProps> = ({
             {form.isRecurring && (
               <select
                 value={form.recurringFrequency}
-                onChange={e => setForm(p => ({ ...p, recurringFrequency: e.target.value as typeof form.recurringFrequency }))}
-                className="input ml-auto text-xs py-1"
+                onChange={e => setForm(p => ({
+                  ...p,
+                  recurringFrequency: e.target.value as typeof form.recurringFrequency,
+                }))}
+                className="input ml-auto text-xs py-1 w-auto"
               >
                 <option value="weekly">Semanal</option>
                 <option value="biweekly">Quincenal</option>
@@ -447,15 +444,53 @@ const PostForm: React.FC<PostFormProps> = ({
         </>
       )}
 
+      {/* ── MEDIA TAB ── */}
+      {tab === 'media' && (
+        <>
+          <div className="bg-violet-50 border border-violet-100 rounded-xl p-3 text-xs text-violet-700">
+            Los archivos se suben a Supabase Storage y se convierten en URLs públicas automáticamente.
+            También podés pegar links de Google Drive, Canva o Dropbox.
+          </div>
+
+          {/* Cover image */}
+          <MediaUploader
+            label="🖼 Imagen de portada"
+            urls={form.coverImage}
+            onChange={urls => setForm(p => ({ ...p, coverImage: urls }))}
+            accept={IMAGE_ACCEPT}
+            single
+          />
+
+          {/* Media files */}
+          <MediaUploader
+            label="📁 Archivos y medios (imágenes, videos, PDFs)"
+            urls={form.mediaUrls}
+            onChange={urls => setForm(p => ({ ...p, mediaUrls: urls }))}
+            accept={MEDIA_ACCEPT}
+            maxItems={20}
+          />
+
+          {/* Inspo links */}
+          <MediaUploader
+            label="✨ Inspiración / Referencias (links externos)"
+            urls={form.inspoLinks}
+            onChange={urls => setForm(p => ({ ...p, inspoLinks: urls }))}
+            accept={MEDIA_ACCEPT}
+            maxItems={10}
+          />
+        </>
+      )}
+
+      {/* ── PERFORMANCE TAB ── */}
       {tab === 'performance' && (
         <>
           <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 text-xs text-amber-700">
-            Completá estas métricas después de publicar el contenido para llevar un registro de rendimiento.
+            Completá estas métricas después de publicar el contenido.
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { key: 'performanceReach', label: 'Alcance' },
-              { key: 'performanceLikes', label: 'Likes' },
+              { key: 'performanceReach',    label: 'Alcance' },
+              { key: 'performanceLikes',    label: 'Likes' },
               { key: 'performanceComments', label: 'Comentarios' },
             ].map(({ key, label }) => (
               <div key={key}>
@@ -463,7 +498,7 @@ const PostForm: React.FC<PostFormProps> = ({
                 <input
                   type="number"
                   min={0}
-                  value={(form as any)[key] || ''}
+                  value={(form as Record<string, unknown>)[key] as number || ''}
                   onChange={e => setForm(p => ({ ...p, [key]: Number(e.target.value) }))}
                   className="input"
                   placeholder="0"
@@ -472,7 +507,9 @@ const PostForm: React.FC<PostFormProps> = ({
             ))}
           </div>
           <div>
-            <label className="label flex items-center gap-1"><BarChart2 className="w-3 h-3" /> Notas de performance</label>
+            <label className="label flex items-center gap-1">
+              <BarChart2 className="w-3 h-3" /> Notas de performance
+            </label>
             <textarea
               value={form.performanceNotes}
               onChange={e => setForm(p => ({ ...p, performanceNotes: e.target.value }))}
@@ -493,7 +530,7 @@ const PostForm: React.FC<PostFormProps> = ({
           type="button"
           onClick={handleSave}
           disabled={!form.caption.trim() || form.platforms.length === 0 || !form.date}
-          className="btn-primary bg-violet-600 hover:bg-violet-700 flex items-center gap-2 disabled:opacity-50"
+          className="btn-primary flex items-center gap-2 disabled:opacity-50"
         >
           {isEditing ? 'Guardar cambios' : 'Agregar post'}
         </button>
