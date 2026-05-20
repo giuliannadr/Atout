@@ -91,7 +91,7 @@ const CMAccountDetail: React.FC = () => {
   if (!account) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
-        <Topbar />
+        <Topbar onNewProject={() => {}} />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <Megaphone className="w-12 h-12 text-gray-200 mx-auto mb-3" />
@@ -254,7 +254,7 @@ const CMAccountDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Topbar />
+      <Topbar onNewProject={() => {}} />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-6">
         {/* Back + header */}

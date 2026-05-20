@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, Clock, AlertTriangle, CheckCircle2, DollarSign, Calendar } from 'lucide-react';
+import { TrendingUp, AlertTriangle, CheckCircle2, DollarSign, Calendar } from 'lucide-react';
 import { useProjectStore } from '../../store/projectStore';
 import { useSettingsStore } from '../../store/settingsStore';
 
@@ -16,7 +16,6 @@ const QuickStatsWidget: React.FC = () => {
 
   // Financial stats
   const now   = new Date();
-  const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
   let billedThisMonth = 0;
   let pendingAmount   = 0;

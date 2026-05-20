@@ -42,7 +42,7 @@ const ContentCalendar: React.FC<ContentCalendarProps> = ({
   posts,
   hashtagGroups = [],
   contentPillars = [],
-  accountName,
+  accountName: _accountName,
   onAddPost,
   onUpdatePost,
   onDeletePost,

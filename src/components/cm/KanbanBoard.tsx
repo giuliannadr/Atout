@@ -100,7 +100,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 {colPosts.map(post => {
                   const platform = post.platforms?.[0] ?? post.platform;
                   const allPlatforms = post.platforms ?? [post.platform];
-                  const platformStyle = PLATFORM_COLORS[platform] ?? PLATFORM_COLORS.default;
 
                   return (
                     <div

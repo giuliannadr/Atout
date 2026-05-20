@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, Clock, Link, Hash, AlignLeft, Repeat, BarChart2, FileImage, AlertTriangle, ThumbsUp } from 'lucide-react';
+import { Calendar, Clock, Link, Hash, AlignLeft, Repeat, BarChart2, FileImage, AlertTriangle, ThumbsUp } from 'lucide-react';
 import type { ContentPost, CMHashtagGroup, PostPriority, ApprovalStatus } from '../../types';
 
 const PLATFORMS = ['Instagram', 'TikTok', 'Facebook', 'LinkedIn', 'YouTube', 'Pinterest', 'Twitter/X'];

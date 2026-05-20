@@ -76,9 +76,9 @@ const RootRoute: React.FC = () => {
 
 
 function App() {
-  const { user, setUser, setLoading } = useAuthStore();
+  const { setUser, setLoading } = useAuthStore();
   const { fetchProjects, clearProjects } = useProjectStore();
-  const { fetchSettings, settings, clearSettings } = useSettingsStore();
+  const { fetchSettings, clearSettings } = useSettingsStore();
   const { addNotification } = useNotificationStore();
 
   const loadedForUser = useRef<string | null>(null);

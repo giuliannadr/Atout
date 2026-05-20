@@ -3,7 +3,7 @@ import {
   Users, Link2, Plus, X, ExternalLink, StickyNote,
 } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
-import type { TeamResource, PinnedNote, ResourceIcon } from '../../types';
+import type { PinnedNote, ResourceIcon } from '../../types';
 
 // ─── Resource icon map ────────────────────────────────────────────────────────
 
@@ -27,7 +27,7 @@ const NOTE_COLORS: { value: PinnedNote['color']; bg: string; border: string; dot
   { value: 'pink',   bg: 'bg-pink-50',    border: 'border-pink-200',  dot: 'bg-pink-400'  },
 ];
 
-function ResourceIconEl({ icon, size = 16 }: { icon: ResourceIcon; size?: number }) {
+function ResourceIconEl({ size = 16 }: { icon: ResourceIcon; size?: number }) {
   return <Link2 size={size} className="shrink-0" />;
 }
 
@@ -79,8 +79,6 @@ const TeamHubWidget: React.FC = () => {
     setNoteContent('');
     setShowAddNote(false);
   };
-
-  const selectedRes = RESOURCE_OPTIONS.find(o => o.icon === resIcon) ?? RESOURCE_OPTIONS[9];
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">

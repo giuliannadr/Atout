@@ -116,7 +116,7 @@ const CalendarPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Topbar />
+      <Topbar onNewProject={() => {}} />
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-6">
         {/* Header */}
         <div className="mb-6 flex items-center gap-3">

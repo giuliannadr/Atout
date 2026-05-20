@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Loader2, CheckCircle2, ArrowRight } from 'lucide-react';
-import AtoutLogo, { AtoutMark } from '../components/brand/AtoutLogo';
+import AtoutLogo from '../components/brand/AtoutLogo';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
 

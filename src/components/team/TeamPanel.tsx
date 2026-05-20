@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Pencil, X, Check } from 'lucide-react';
+import { Plus, Pencil, X } from 'lucide-react';
 import type { TeamMember } from '../../types';
 
 // ─── Props ───────────────────────────────────────────────

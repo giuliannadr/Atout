@@ -6,7 +6,6 @@ import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useProjectStore } from '../../store/projectStore';
-import { useNotificationStore } from '../../store/notificationStore';
 import { effectivePlan } from '../../types';
 import UpgradeModal from './UpgradeModal';
 
@@ -18,7 +17,6 @@ const Topbar: React.FC<TopbarProps> = ({ onNewProject }) => {
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
   const { settings, clearSettings } = useSettingsStore();
-  const { addNotification } = useNotificationStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
 

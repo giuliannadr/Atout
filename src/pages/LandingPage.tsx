@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Check, Monitor, Laptop, Terminal, Code2, Megaphone,
-  BarChart2, Calendar, FileText, Users, Shield, Zap,
+  Check, Code2, Megaphone,
+  BarChart2, Users, Shield, Zap,
   Globe, ArrowRight, ChevronDown, Star, Layout,
-  CreditCard, Briefcase, Clock, Download, GitPullRequest,
+  CreditCard, GitPullRequest,
   TrendingUp, CheckCircle2, Sparkles,
 } from 'lucide-react';
 import AtoutLogo, { AtoutMark } from '../components/brand/AtoutLogo';
-
-const APP_NAME = 'Atout';
 
 // ── Blob background ────────────────────────────────────────────────────────────
 const BlobBg: React.FC<{ className?: string; variant?: 'hero' | 'cta' | 'subtle' }> = ({
