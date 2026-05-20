@@ -97,7 +97,6 @@ const MetricsPanel: React.FC<MetricsPanelProps> = ({
   }).filter(Boolean) as CMMetrics[];
 
   const maxFollowers = Math.max(...latestByPlatform.map(m => m.followers), 1);
-  const maxReach = Math.max(...filtered.map(m => m.reach), 1);
 
   return (
     <div className="space-y-5">

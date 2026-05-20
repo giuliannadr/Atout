@@ -30,7 +30,7 @@ const Settings: React.FC = () => {
     settings, updateSettings, redeemCoupon,
     couponLoading, couponError, couponSuccess,
     addTeamMember, updateTeamMember, removeTeamMember,
-    addSlot, removeSlot, updateSlot,
+    addSlot, removeSlot,
   } = useSettingsStore();
   const { projects, addProject } = useProjectStore();
   const { addNotification } = useNotificationStore();
